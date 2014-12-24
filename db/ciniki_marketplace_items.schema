@@ -1,0 +1,59 @@
+#
+# Description
+# -----------
+# This tables stores the seller items that are for sale in the marketplace.
+#
+# Fields
+# ------
+# id:				The ID assigned to the marketplace.
+# uuid:				The Universal Unique ID.
+# business_id:		The business the marketplace is attached to.
+#
+# market_id:		The ID of the marketplace.
+# seller_id:		The ID of the customer/member the item is from.
+#
+# code:				The code for the item. This should be a combination of customer initials and number for item.
+# name:				The name for the item. This can also be a description.
+#
+# type:				The type of item.
+# category:			The category for the item.
+#
+# price:			The price of the item.
+# fee_percent:		The percentage of the sell price
+# sell_date:		The date the item sold.
+# sell_price:		The price the item sold for.  This is used for discounts of bulk items.
+# business_fee:		The fee/commission charged on the sale, the part the business keeps.
+# seller_amount:	The amount to be paid to the seller.
+#
+# primary_image_id:	The ID of the image to show in listings and top of item page. **future**
+# synopsis:			The synopsis of the item **future**.
+# description:		The longer text description of the item **future**
+#
+# notes:			Any notes for the item, special instructions, etc.
+#
+# date_added:		The UTC date and time the record was added.
+# last_updated:		The UTC date and time the record was last updated.
+#
+create table ciniki_marketplace_items (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
+	market_id int not null,
+	seller_id int not null,
+	code varchar(50) not null,
+	name varchar(150) not null,
+	type varchar(50) not null,
+	category varchar(50) not null,
+	price decimal(19,4) not null,
+	fee_percent decimal(19,4) not null,
+	sell_date datetime not null,
+	sell_price decimal(19,4) not null,
+	business_fee decimal(19,4) not null,
+	seller_amount decimal(19,4) not null,
+	notes varchar(2000) not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (id),
+	unique index (market_id, code),
+	index business_uuid (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';
