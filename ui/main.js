@@ -500,7 +500,7 @@ function ciniki_marketplaces_main() {
 	}
 
 	this.downloadInventory = function(mid, format) {
-		var args = {'business_id:M.curBusinessID, 'market_id':mid, 'output':format};
+		var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
 		window.open(M.api.getUploadURL('ciniki.marketplaces.marketInventory', args));
 	};
 
