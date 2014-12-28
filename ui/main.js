@@ -59,8 +59,8 @@ function ciniki_marketplaces_main() {
 				}},
 			'menu':{'label':'', 'aside':'yes', 'list':{
 				'inventoryexcel':{'label':'Download Inventory (Excel)', 'fn':'M.ciniki_marketplaces_main.downloadInventory(M.ciniki_marketplaces_main.market.market_id, \'excel\');'},
-				'pricelistpdf':{'label':'Download Price List (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadInventory(M.ciniki_marketplaces_main.market.market_id, \'pdf\');'},
-				'sellers':{'label':'Seller Reports (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadInventory(M.ciniki_marketplaces_main.market.market_id);'},
+				'pricelistpdf':{'label':'Download Price List (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadPriceList(M.ciniki_marketplaces_main.market.market_id, \'pdf\');'},
+				'sellers':{'label':'Seller Reports (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadSellerSummary(M.ciniki_marketplaces_main.market.market_id,\'pdf\',0);'},
 				}},
 			'sellers':{'label':'', 'type':'simplegrid', 'num_cols':5,
 				'headerValues':['Seller', 'Status', 'Value', 'Fees', 'Net'],
@@ -167,6 +167,9 @@ function ciniki_marketplaces_main() {
 				'status_text':{'label':'Status'},
 				'flags_text':{'label':'Options'},
 				}},
+			'reports':{'label':'', 'list':{
+				'summarypdf':{'label':'Summary (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadSellerSummary(M.ciniki_marketplaces_main.market.market_id,\'pdf\',M.ciniki_marketplaces_main.seller.seller_id);'},
+				}},
 			'items':{'label':'Items', 'type':'simplegrid', 'num_cols':7,
 				'headerValues':['Code', 'Item', 'Price', 'Fee%', 'Sell Date', 'Fees', 'Sell Price'],
 				'cellClasses':['', ''],
@@ -179,12 +182,20 @@ function ciniki_marketplaces_main() {
 				}},
 		};
 		this.seller.sectionData = function(s) {
-			if( s == 'info' ) { return this.sections[s].list; }
+			if( s == 'info' || s == 'reports' ) { return this.sections[s].list; }
 			return this.data[s];
 		};
-		this.seller.listLabel = function(s, i, d) { return d.label; }
+		this.seller.listLabel = function(s, i, d) { 
+			if( s == 'info' ) { return d.label; }
+			return '';
+		};
 		this.seller.listValue = function(s, i, d) {
+			if( s == 'reports' ) { return d.label; }
 			return this.data[i];
+		};
+		this.seller.listFn = function(s, i, d) {
+			if( s == 'reports' ) { return d.fn; }
+			return null;
 		};
 		this.seller.cellValue = function(s, i, j, d) {
 			if( s == 'customer_details' ) {
@@ -504,6 +515,19 @@ function ciniki_marketplaces_main() {
 		window.open(M.api.getUploadURL('ciniki.marketplaces.marketInventory', args));
 	};
 
+	this.downloadPriceList = function(mid, format) {
+		var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
+		window.open(M.api.getUploadURL('ciniki.marketplaces.marketPriceList', args));
+	};
+
+	this.downloadSellerSummary = function(mid, format, sid) {
+		var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
+		if( sid != null && sid > 0 ) {
+			args.seller_id = sid;
+		}
+		window.open(M.api.getUploadURL('ciniki.marketplaces.marketSellerSummary', args));
+	};
+
 	//
 	// Seller functions
 	//
@@ -618,7 +642,7 @@ function ciniki_marketplaces_main() {
 	}
 
 	//
-	// Item functdions
+	// Item functions
 	//
 	this.itemEdit = function(cb, iid, sid) {
 		this.itemedit.reset();
