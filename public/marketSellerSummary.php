@@ -33,7 +33,7 @@ function ciniki_marketplaces_marketSellerSummary($ciniki) {
     // check permission to run this function for this business
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketInventory'); 
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketSellerSummary'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -92,7 +92,7 @@ function ciniki_marketplaces_marketSellerSummary($ciniki) {
 		return $rc;
 	}
 	if( !isset($rc['market']) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2120', 'msg'=>'Market does not exist'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2118', 'msg'=>'Market does not exist'));
 	}
 	$market_name = $rc['market']['name'];
 

@@ -31,7 +31,7 @@ function ciniki_marketplaces_marketList($ciniki) {
     // Check access to business_id as owner, or sys admin. 
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketplaceList');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketList');
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
