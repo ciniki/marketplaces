@@ -512,12 +512,12 @@ function ciniki_marketplaces_main() {
 
 	this.downloadInventory = function(mid, format) {
 		var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
-		window.open(M.api.getUploadURL('ciniki.marketplaces.marketInventory', args));
+		M.api.openPDF('ciniki.marketplaces.marketInventory', args);
 	};
 
 	this.downloadPriceList = function(mid, format) {
 		var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
-		window.open(M.api.getUploadURL('ciniki.marketplaces.marketPriceList', args));
+		M.api.openPDF('ciniki.marketplaces.marketPriceList', args);
 	};
 
 	this.downloadSellerSummary = function(mid, format, sid) {
@@ -525,7 +525,7 @@ function ciniki_marketplaces_main() {
 		if( sid != null && sid > 0 ) {
 			args.seller_id = sid;
 		}
-		window.open(M.api.getUploadURL('ciniki.marketplaces.marketSellerSummary', args));
+		M.api.openPDF('ciniki.marketplaces.marketSellerSummary', args);
 	};
 
 	//
