@@ -155,19 +155,19 @@ function ciniki_marketplaces_main() {
 		//
 		this.seller = new M.panel('Seller',
 			'ciniki_marketplaces_main', 'seller',
-			'mc', 'medium mediumflex', 'sectioned', 'ciniki.marketplaces.main.seller');
+			'mc', 'large narrowaside', 'sectioned', 'ciniki.marketplaces.main.seller');
 		this.seller.data = {};
 		this.seller.market_id = 0;
 		this.seller.seller_id = 0;
 		this.seller.sections = {
-			'customer_details':{'label':'Seller', 'type':'simplegrid', 'num_cols':2,
+			'customer_details':{'label':'Seller', 'aside':'yes', 'type':'simplegrid', 'num_cols':2,
 				'cellClasses':['label',''],
 				},
-			'info':{'label':'', 'list':{
+			'info':{'label':'', 'aside':'yes', 'list':{
 				'status_text':{'label':'Status'},
 				'flags_text':{'label':'Options'},
 				}},
-			'reports':{'label':'', 'list':{
+			'reports':{'label':'', 'aside':'yes', 'list':{
 				'summarypdf':{'label':'Summary (PDF)', 'fn':'M.ciniki_marketplaces_main.downloadSellerSummary(M.ciniki_marketplaces_main.market.market_id,\'pdf\',M.ciniki_marketplaces_main.seller.seller_id);'},
 				}},
 			'items':{'label':'Items', 'type':'simplegrid', 'num_cols':7,
@@ -175,9 +175,11 @@ function ciniki_marketplaces_main() {
 				'cellClasses':['', ''],
 				'sortable':'yes', 'sortTypes':['text', 'text', 'altnumber', 'altnumber', 'altnumber'],
 				'noData':'No items',
+                'addTxt':'Add Item',
+                'addFn':'M.ciniki_marketplaces_main.itemEdit(\'M.ciniki_marketplaces_main.sellerShow();\',0,M.ciniki_marketplaces_main.seller.seller_id);',
 			},
 			'_buttons':{'label':'', 'buttons':{
-				'add':{'label':'Add Item', 'fn':'M.ciniki_marketplaces_main.itemEdit(\'M.ciniki_marketplaces_main.sellerShow();\',0,M.ciniki_marketplaces_main.seller.seller_id);'},
+//				'add':{'label':'Add Item', 'fn':'M.ciniki_marketplaces_main.itemEdit(\'M.ciniki_marketplaces_main.sellerShow();\',0,M.ciniki_marketplaces_main.seller.seller_id);'},
 				'edit':{'label':'Edit Seller', 'fn':'M.ciniki_marketplaces_main.sellerEdit(\'M.ciniki_marketplaces_main.sellerShow();\',M.ciniki_marketplaces_main.seller.seller_id,M.ciniki_marketplaces_main.seller.market_id,0);'},
 				}},
 		};
@@ -296,17 +298,17 @@ function ciniki_marketplaces_main() {
 		this.selleredit.updateCustomer = function(cid) {
 			if( cid != null && this.customer_id != cid ) { this.customer_id = cid; }
 			if( this.customer_id > 0 ) {
-				M.api.getJSONCb('ciniki.customers.customerDetails', {'business_id':M.curBusinessID,
-					'customer_id':this.edit.customer_id}, function(rsp) {
-						if( rsp.stat != 'ok' ) {
-							M.api.err(rsp);
-							return false;
-						}
-						var p = M.ciniki_marketplaces_main.selleredit;
-						p.data.customer = rsp.details;
-						p.refreshSection('customer_details');
-						p.show();
-					});
+				M.api.getJSONCb('ciniki.customers.customerDetails', {'business_id':M.curBusinessID, 'customer_id':this.customer_id, 
+                    'phones':'yes', 'emails':'yes', 'addresses':'yes'}, function(rsp) {
+                        if( rsp.stat != 'ok' ) {
+                            M.api.err(rsp);
+                            return false;
+                        }
+                        var p = M.ciniki_marketplaces_main.selleredit;
+                        p.data.customer_details = rsp.details;
+                        p.refreshSection('customer_details');
+                        p.show();
+                    });
 			}
 		};
 		this.selleredit.addButton('save', 'Save', 'M.ciniki_marketplaces_main.sellerSave();');
@@ -571,6 +573,7 @@ function ciniki_marketplaces_main() {
 					}
 					var p = M.ciniki_marketplaces_main.selleredit;
 					p.data = rsp.seller;
+                    p.customer_id = rsp.seller.customer_id;
 					p.refresh();
 					p.show(cb);
 				});
