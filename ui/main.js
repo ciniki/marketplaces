@@ -362,6 +362,7 @@ function ciniki_marketplaces_main() {
 			var business_fee = this.formFieldValue(this.sections[s].fields['business_fee'], 'business_fee');
 			var seller_amount = this.formFieldValue(this.sections[s].fields['seller_amount'], 'seller_amount');
 			var sp = parseFloat(sell_price.replace(/\$/,''));
+            bf = 0;
 			if( fee_percent > 0 ) {
 				bf = (sp * (fee_percent/100));
 				bf = bf.toFixed(2);
