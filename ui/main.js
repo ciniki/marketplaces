@@ -706,12 +706,12 @@ function ciniki_marketplaces_main() {
 	this.itemDelete = function() {
 		if( confirm("Are you sure you want to remove this item?") ) {
 			var rsp = M.api.getJSONCb('ciniki.marketplaces.marketItemDelete', 
-				{'business_id':M.curBusinessID, 'item_id':M.ciniki_marketplaces_main.item.item_id}, function(rsp) {
+				{'business_id':M.curBusinessID, 'item_id':M.ciniki_marketplaces_main.itemedit.item_id}, function(rsp) {
 					if( rsp.stat != 'ok' ) {
 						M.api.err(rsp);
 						return false;
 					}
-					M.ciniki_marketplaces_main.item.close();
+					M.ciniki_marketplaces_main.itemedit.close();
 				});
 		}
 	}
