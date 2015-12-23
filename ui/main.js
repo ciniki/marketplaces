@@ -546,6 +546,7 @@ function ciniki_marketplaces_main() {
 				}
 				var p = M.ciniki_marketplaces_main.seller;
 				p.data = rsp.seller;
+                p.market_id = rsp.seller.market_id;
 				p.refresh();
 				p.show(cb);
 			});

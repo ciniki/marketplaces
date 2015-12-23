@@ -70,6 +70,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
 	// Get the seller details
 	//
 	$strsql = "SELECT ciniki_marketplace_sellers.id, "
+		. "ciniki_marketplace_sellers.market_id, "
 		. "ciniki_marketplace_sellers.customer_id, "
 		. "ciniki_marketplace_sellers.status, "
 		. "ciniki_marketplace_sellers.status AS status_text, "
@@ -82,7 +83,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
 		array('container'=>'sellers', 'fname'=>'id', 'name'=>'seller',
-			'fields'=>array('id', 'customer_id', 'status', 'status_text', 'flags', 'flags_text'),
+			'fields'=>array('id', 'market_id', 'customer_id', 'status', 'status_text', 'flags', 'flags_text'),
 			'maps'=>array('status_text'=>$maps['seller']['status'], 'flags_text'=>$maps['seller']['flags']),
 			),
 	));
