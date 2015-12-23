@@ -132,7 +132,7 @@ function ciniki_marketplaces_marketInventory($ciniki) {
 	require($ciniki['config']['core']['lib_dir'] . '/PHPExcel/PHPExcel.php');
 	$objPHPExcel = new PHPExcel();
 	$sheet = $objPHPExcel->setActiveSheetIndex(0);
-	$sheet->setTitle($market_name);
+	$sheet->setTitle(substr($market_name, 0, 31));
 
 	//
 	// Headers
