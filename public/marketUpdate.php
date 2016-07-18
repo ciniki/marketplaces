@@ -8,12 +8,12 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:		The ID of the business the marketplace is attached to.
-// name:			(optional) The new name of the marketplace.
-// url:				(optional) The new URL for the marketplace website.
-// description:		(optional) The new description for the marketplace.
-// start_date:		(optional) The new date the marketplace starts.  
-// end_date:		(optional) The new date the marketplace ends, if it's longer than one day.
+// business_id:     The ID of the business the marketplace is attached to.
+// name:            (optional) The new name of the marketplace.
+// url:             (optional) The new URL for the marketplace website.
+// description:     (optional) The new description for the marketplace.
+// start_date:      (optional) The new date the marketplace starts.  
+// end_date:        (optional) The new date the marketplace ends, if it's longer than one day.
 // 
 // Returns
 // -------
@@ -27,10 +27,10 @@ function ciniki_marketplaces_marketUpdate(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
         'market_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Market'), 
-		'name'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Name'), 
-		'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'), 
-		'start_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'name'=>'Start Date'), 
-		'end_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'name'=>'End Date'), 
+        'name'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Name'), 
+        'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'), 
+        'start_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'name'=>'Start Date'), 
+        'end_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'name'=>'End Date'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -47,43 +47,43 @@ function ciniki_marketplaces_marketUpdate(&$ciniki) {
         return $rc;
     }   
 
-	//
-	// Start transaction
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionRollback');
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionCommit');
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbAddModuleHistory');
-	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.marketplaces');
-	if( $rc['stat'] != 'ok' ) { 
-		return $rc;
-	}   
+    //
+    // Start transaction
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionRollback');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionCommit');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbAddModuleHistory');
+    $rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.marketplaces');
+    if( $rc['stat'] != 'ok' ) { 
+        return $rc;
+    }   
 
-	//
-	// Update the marketplace in the database
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-	$rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.marketplaces.market', $args['market_id'], $args, 0x04);
-	if( $rc['stat'] != 'ok' ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
-		return $rc;
-	}
+    //
+    // Update the marketplace in the database
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
+    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.marketplaces.market', $args['market_id'], $args, 0x04);
+    if( $rc['stat'] != 'ok' ) {
+        ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
+        return $rc;
+    }
 
-	//
-	// Commit the transaction
-	//
-	$rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.marketplaces');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
+    //
+    // Commit the transaction
+    //
+    $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.marketplaces');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
 
-	//
-	// Update the last_change date in the business modules
-	// Ignore the result, as we don't want to stop user updates if this fails.
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'marketplaces');
+    //
+    // Update the last_change date in the business modules
+    // Ignore the result, as we don't want to stop user updates if this fails.
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'marketplaces');
 
-	return array('stat'=>'ok');
+    return array('stat'=>'ok');
 }
 ?>

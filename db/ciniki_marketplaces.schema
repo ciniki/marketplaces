@@ -6,35 +6,35 @@
 #
 # Fields
 # ------
-# id:				The ID assigned to the marketplace.
-# uuid:				The Universal Unique ID.
-# business_id:		The business the marketplace is attached to.
+# id:               The ID assigned to the marketplace.
+# uuid:             The Universal Unique ID.
+# business_id:      The business the marketplace is attached to.
 #
-# name:				The name for the marketplaces.
+# name:             The name for the marketplaces.
 #
-# status:			The status of the market.
+# status:           The status of the market.
 #
-#					10 - Active
-#					50 - Archived
+#                   10 - Active
+#                   50 - Archived
 #
-# start_date:		The date of the start of the marketplace.
-# end_date:			The date of the end of the marketplace.
+# start_date:       The date of the start of the marketplace.
+# end_date:         The date of the end of the marketplace.
 #
-# date_added:		The UTC date and time the record was added.
-# last_updated:		The UTC date and time the record was last updated.
+# date_added:       The UTC date and time the record was added.
+# last_updated:     The UTC date and time the record was last updated.
 #
 create table ciniki_marketplaces (
-	id int not null auto_increment,
-	uuid char(36) not null,
-	business_id int not null,
-	name varchar(150) not null,
-	status tinyint unsigned not null,
-	start_date date not null,
-	end_date date not null,
-	date_added datetime not null,
-	last_updated datetime not null,
-	primary key (id),
-	index (business_id, name),
-	unique index (business_id, name),
-	index business_uuid (business_id, uuid, last_updated)
+    id int not null auto_increment,
+    uuid char(36) not null,
+    business_id int not null,
+    name varchar(150) not null,
+    status tinyint unsigned not null,
+    start_date date not null,
+    end_date date not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    primary key (id),
+    index (business_id, name),
+    unique index (business_id, name),
+    index business_uuid (business_id, uuid, last_updated)
 ) ENGINE='InnoDB', COMMENT='v1.01';

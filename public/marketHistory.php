@@ -10,10 +10,10 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:			The ID of the business to get the details for.
-// market_id:			The ID of the marketplace to get the history for.
-// field:				The field to get the history for. This can be any of the elements 
-//						returned by the ciniki.marketplaces.get method.
+// business_id:         The ID of the business to get the details for.
+// market_id:           The ID of the marketplace to get the history for.
+// field:               The field to get the history for. This can be any of the elements 
+//                      returned by the ciniki.marketplaces.get method.
 //
 // Returns
 // -------
@@ -23,39 +23,39 @@
 // </history>
 //
 function ciniki_marketplaces_marketHistory($ciniki) {
-	//
-	// Find all the required and optional arguments
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
-	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
-		'market_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Market Place'), 
-		'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'), 
-		));
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$args = $rc['args'];
-	
-	//
-	// Check access to business_id as owner, or sys admin
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-	$rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketHistory');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
+    //
+    // Find all the required and optional arguments
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
+    $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'market_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Market Place'), 
+        'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'), 
+        ));
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $args = $rc['args'];
+    
+    //
+    // Check access to business_id as owner, or sys admin
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketHistory');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
 
-	if( $args['field'] == 'start_date' ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field'],'date');
-	}
-	if( $args['field'] == 'end_date' ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field'], 'date');
-	}
+    if( $args['field'] == 'start_date' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
+        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field'],'date');
+    }
+    if( $args['field'] == 'end_date' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
+        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field'], 'date');
+    }
 
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
-	return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
+    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplaces', $args['market_id'], $args['field']);
 }
 ?>
