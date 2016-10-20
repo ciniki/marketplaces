@@ -54,7 +54,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
-    $date_format = ciniki_users_dateFormat($ciniki);
+    $date_format = ciniki_users_dateFormat($ciniki, 'php');
 
     //
     // Load marketplaces maps
@@ -70,8 +70,8 @@ function ciniki_marketplaces_marketGet($ciniki) {
         . "ciniki_marketplaces.name, "
         . "ciniki_marketplaces.status, "
         . "ciniki_marketplaces.status AS status_text, "
-        . "DATE_FORMAT(ciniki_marketplaces.start_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS start_date, "
-        . "DATE_FORMAT(ciniki_marketplaces.end_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS end_date "
+        . "ciniki_marketplaces.start_date, "
+        . "ciniki_marketplaces.end_date "
         . "FROM ciniki_marketplaces "
         . "WHERE ciniki_marketplaces.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "AND ciniki_marketplaces.id = '" . ciniki_core_dbQuote($ciniki, $args['market_id']) . "' "
@@ -82,6 +82,8 @@ function ciniki_marketplaces_marketGet($ciniki) {
         array('container'=>'markets', 'fname'=>'id', 'name'=>'market',
             'fields'=>array('id', 'name', 'status', 'status_text', 'start_date', 'end_date'),
             'maps'=>array('status_text'=>$maps['market']['status']),
+            'utctotz'=>array('start_date'=>array('timezone'=>'UTC', 'format'=>$date_format),
+                'end_date'=>array('timezone'=>'UTC', 'format'=>$date_format)),
             ),
     ));
     if( $rc['stat'] != 'ok' ) {
@@ -91,6 +93,11 @@ function ciniki_marketplaces_marketGet($ciniki) {
         return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2106', 'msg'=>'Unable to find market'));
     }
     $market = $rc['markets'][0]['market'];
+
+    $market['dates'] = $market['start_date'];
+    if( $market['end_date'] != '' ) {
+        $market['dates'] .= ' - ' . $market['end_dates'];
+    }
 
     if( isset($args['sellers']) && $args['sellers'] == 'summary' ) {
         //
@@ -131,6 +138,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
             $market['sellers'] = array();
         } else {
             $market['sellers'] = $rc['sellers'];
+            $market['totals'] = array('value'=>0, 'fees'=>0, 'net'=>0);
             foreach($market['sellers'] as $sid => $seller) {
                 $market['sellers'][$sid]['seller']['total_price'] = numfmt_format_currency($intl_currency_fmt, 
                     $seller['seller']['total_price'], $intl_currency);
@@ -138,7 +146,13 @@ function ciniki_marketplaces_marketGet($ciniki) {
                     $seller['seller']['total_business_fee'], $intl_currency);
                 $market['sellers'][$sid]['seller']['total_seller_amount'] = numfmt_format_currency($intl_currency_fmt, 
                     $seller['seller']['total_seller_amount'], $intl_currency);
+                $market['totals']['value'] = bcadd($market['totals']['value'], $seller['seller']['total_price'], 2);
+                $market['totals']['fees'] = bcadd($market['totals']['fees'], $seller['seller']['total_business_fee'], 2);
+                $market['totals']['net'] = bcadd($market['totals']['net'], $seller['seller']['total_seller_amount'], 2);
             }
+            $market['totals']['value'] = numfmt_format_currency($intl_currency_fmt, $market['totals']['value'], $intl_currency);
+            $market['totals']['fees'] = numfmt_format_currency($intl_currency_fmt, $market['totals']['fees'], $intl_currency);
+            $market['totals']['net'] = numfmt_format_currency($intl_currency_fmt, $market['totals']['net'], $intl_currency);
         }
     }
 

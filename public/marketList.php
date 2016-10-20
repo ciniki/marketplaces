@@ -37,22 +37,23 @@ function ciniki_marketplaces_marketList($ciniki) {
     }   
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
-    $date_format = ciniki_users_dateFormat($ciniki);
+    $date_format = ciniki_users_dateFormat($ciniki, 'php');
     
     //
     // Get the list of marketplaces
     //
-    $strsql = "SELECT id, name, status, start_date, end_date, "
-        . "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS start_date, "
-        . "DATE_FORMAT(end_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS end_date "
+    $strsql = "SELECT id, name, status, start_date, end_date "
         . "FROM ciniki_marketplaces "
         . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "ORDER BY ciniki_marketplaces.start_date DESC "
         . "";
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
-        array('container'=>'markets', 'fname'=>'id', 'name'=>'market',
-            'fields'=>array('id', 'name', 'status', 'start_date', 'end_date')),
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.marketplaces', array(
+        array('container'=>'markets', 'fname'=>'id', 
+            'fields'=>array('id', 'name', 'status', 'start_date', 'end_date'),
+            'utctotz'=>array('start_date'=>array('timezone'=>'UTC', 'format'=>$date_format),
+                'end_date'=>array('timezone'=>'UTC', 'format'=>$date_format)),
+            ),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
