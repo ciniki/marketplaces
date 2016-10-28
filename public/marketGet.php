@@ -106,6 +106,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
         $strsql = "SELECT ciniki_marketplace_sellers.id, "
             . "ciniki_marketplace_sellers.status, "
             . "ciniki_marketplace_sellers.status AS status_text, "
+            . "ciniki_marketplace_sellers.num_items, "
             . "ciniki_customers.display_name, "
             . "SUM(ciniki_marketplace_items.price) AS total_price, "
             . "SUM(ciniki_marketplace_items.business_fee) AS total_business_fee, "
@@ -126,7 +127,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
             . "";
         $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
             array('container'=>'sellers', 'fname'=>'id', 'name'=>'seller',
-                'fields'=>array('id', 'display_name', 'status', 'status_text',
+                'fields'=>array('id', 'display_name', 'status', 'status_text', 'num_items',
                     'total_price', 'total_business_fee', 'total_seller_amount'),
                 'maps'=>array('status_text'=>$maps['seller']['status']),
                 ),
@@ -138,7 +139,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
             $market['sellers'] = array();
         } else {
             $market['sellers'] = $rc['sellers'];
-            $market['totals'] = array('value'=>0, 'fees'=>0, 'net'=>0);
+            $market['totals'] = array('items'=>0, 'value'=>0, 'fees'=>0, 'net'=>0);
             foreach($market['sellers'] as $sid => $seller) {
                 $market['sellers'][$sid]['seller']['total_price'] = numfmt_format_currency($intl_currency_fmt, 
                     $seller['seller']['total_price'], $intl_currency);
@@ -146,6 +147,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
                     $seller['seller']['total_business_fee'], $intl_currency);
                 $market['sellers'][$sid]['seller']['total_seller_amount'] = numfmt_format_currency($intl_currency_fmt, 
                     $seller['seller']['total_seller_amount'], $intl_currency);
+                $market['totals']['items'] += $seller['seller']['num_items'];
                 $market['totals']['value'] = bcadd($market['totals']['value'], $seller['seller']['total_price'], 2);
                 $market['totals']['fees'] = bcadd($market['totals']['fees'], $seller['seller']['total_business_fee'], 2);
                 $market['totals']['net'] = bcadd($market['totals']['net'], $seller['seller']['total_seller_amount'], 2);

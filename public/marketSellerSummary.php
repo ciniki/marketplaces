@@ -101,6 +101,7 @@ function ciniki_marketplaces_marketSellerSummary($ciniki) {
     //
     $strsql = "SELECT ciniki_marketplace_sellers.id, "  
         . "ciniki_marketplace_sellers.customer_id, "
+        . "ciniki_marketplace_sellers.num_items, "
         . "ciniki_customers.display_name, "
         . "ciniki_marketplace_items.id AS item_id, "
         . "ciniki_marketplace_items.code, "
@@ -132,7 +133,7 @@ function ciniki_marketplaces_marketSellerSummary($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
     $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.marketplaces', array(
         array('container'=>'sellers', 'fname'=>'id',
-            'fields'=>array('id', 'display_name')),
+            'fields'=>array('id', 'display_name', 'num_items')),
         array('container'=>'items', 'fname'=>'item_id',
             'fields'=>array('id'=>'item_id', 'code', 'name', 'type',
                 'price', 'fee_percent', 'sell_date', 'sell_price', 'business_fee', 'seller_amount')),

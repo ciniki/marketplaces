@@ -75,7 +75,8 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
         . "ciniki_marketplace_sellers.status, "
         . "ciniki_marketplace_sellers.status AS status_text, "
         . "ciniki_marketplace_sellers.flags, "
-        . "ciniki_marketplace_sellers.flags AS flags_text "
+        . "ciniki_marketplace_sellers.flags AS flags_text, "
+        . "ciniki_marketplace_sellers.num_items "
         . "FROM ciniki_marketplace_sellers "
         . "WHERE ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "AND ciniki_marketplace_sellers.id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
@@ -83,7 +84,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
     $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
         array('container'=>'sellers', 'fname'=>'id', 'name'=>'seller',
-            'fields'=>array('id', 'market_id', 'customer_id', 'status', 'status_text', 'flags', 'flags_text'),
+            'fields'=>array('id', 'market_id', 'customer_id', 'status', 'status_text', 'flags', 'flags_text', 'num_items'),
             'maps'=>array('status_text'=>$maps['seller']['status'], 'flags_text'=>$maps['seller']['flags']),
             ),
     ));

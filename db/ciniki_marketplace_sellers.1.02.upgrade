@@ -1,0 +1,5 @@
+#
+# Add the num_items column
+#
+ALTER TABLE ciniki_marketplace_sellers ADD COLUMN num_items int not null AFTER flags;
+ALTER TABLE ciniki_marketplace_sellers COMMENT='v1.02';

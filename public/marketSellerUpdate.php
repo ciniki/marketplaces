@@ -29,6 +29,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Seller'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'flags'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Options'), 
+        'num_items'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Number of Items'), 
         'notes'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Notes'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 

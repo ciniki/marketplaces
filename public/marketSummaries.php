@@ -75,7 +75,42 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
     } else {
         $years = array();
     }
-    
+   
+    //
+    // Get the number of seller items
+    //
+    $strsql = "SELECT ciniki_marketplaces.id, "
+        . "SUM(ciniki_marketplace_sellers.num_items) AS num_items "
+        . "FROM ciniki_marketplaces "
+        . "LEFT JOIN ciniki_marketplace_sellers ON ("
+            . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
+            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . ") "
+        . "WHERE ciniki_marketplaces.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+    if( isset($start_date) && isset($end_date) ) {
+        $strsql .= "AND ((ciniki_marketplaces.start_date >= '" . ciniki_core_dbQuote($ciniki, $start_date) . "' "
+            . "AND ciniki_marketplaces.start_date <= '" . ciniki_core_dbQuote($ciniki, $end_date) . "' "
+            . ") OR ("
+            . "ciniki_marketplaces.end_date >= '" . ciniki_core_dbQuote($ciniki, $start_date) . "' "
+            . "AND ciniki_marketplaces.end_date <= '" . ciniki_core_dbQuote($ciniki, $end_date) . "' "
+            . ")) ";
+    }
+    $strsql .= "GROUP BY ciniki_marketplaces.id "
+        . "ORDER BY ciniki_marketplaces.start_date DESC "
+        . "";
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
+    $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.marketplaces', array(
+        array('container'=>'markets', 'fname'=>'id', 'fields'=>array('id', 'num_items')),
+        ));
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( isset($rc['markets']) ) {
+        $market_items = $rc['markets'];
+    }  else {
+        $market_items = array();
+    }
+
     //
     // Get the list of marketplaces
     //
@@ -84,11 +119,15 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
         . "ciniki_marketplaces.status, "
         . "ciniki_marketplaces.start_date, "
         . "ciniki_marketplaces.end_date, "
-        . "COUNT(ciniki_marketplace_items.id) AS num_items, "
+        . "COUNT(ciniki_marketplace_items.id) AS num_sold, "
         . "SUM(IFNULL(ciniki_marketplace_items.sell_price, 0)) AS total_value, "
         . "SUM(IFNULL(ciniki_marketplace_items.business_fee, 0)) AS total_fees, "
         . "SUM(IFNULL(ciniki_marketplace_items.seller_amount, 0)) AS total_net "
         . "FROM ciniki_marketplaces "
+        . "LEFT JOIN ciniki_marketplace_sellers ON ("
+            . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
+            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . ") "
         . "LEFT JOIN ciniki_marketplace_items ON ("
             . "ciniki_marketplaces.id = ciniki_marketplace_items.market_id "
             . "AND ciniki_marketplace_items.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
@@ -115,7 +154,7 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.marketplaces', array(
         array('container'=>'markets', 'fname'=>'id', 
             'fields'=>array('id', 'name', 'status', 'start_date', 'end_date',
-                'num_items', 'total_value', 'total_fees', 'total_net'),
+                'num_sold', 'total_value', 'total_fees', 'total_net'),
             'utctotz'=>array('start_date'=>array('timezone'=>'UTC', 'format'=>$date_format),
                 'end_date'=>array('timezone'=>'UTC', 'format'=>$date_format)),
             ),
@@ -128,9 +167,15 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
         return array('stat'=>'ok', 'markets'=>$markets, 'years'=>$years);
     } 
     $markets = $rc['markets'];
-    $totals = array('items'=>0, 'value'=>0, 'fees'=>0, 'net'=>0);
+    $totals = array('items'=>0, 'sold'=>0, 'value'=>0, 'fees'=>0, 'net'=>0);
     foreach($markets as $mid => $market) {
-        $totals['items'] += $market['num_items'];
+        if( isset($market_items[$market['id']]['num_items']) ) {
+            $totals['items'] += $market_items[$market['id']]['num_items'];
+            $markets[$mid]['num_items'] = $market_items[$market['id']]['num_items'];
+        } else {
+            $markets[$mid]['num_items'] = 0;
+        }
+        $totals['sold'] += $market['num_sold'];
         $totals['value'] = bcadd($totals['value'], $market['total_value'], 2);
         $totals['fees'] = bcadd($totals['fees'], $market['total_fees'], 2);
         $totals['net'] = bcadd($totals['net'], $market['total_net'], 2);

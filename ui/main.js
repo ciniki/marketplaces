@@ -60,7 +60,7 @@ function ciniki_marketplaces_main() {
     //
     // The market panel 
     //
-    this.market = new M.panel('Market', 'ciniki_marketplaces_main', 'market', 'mc', 'medium mediumaside', 'sectioned', 'ciniki.marketplaces.main.market');
+    this.market = new M.panel('Market', 'ciniki_marketplaces_main', 'market', 'mc', 'large narrowaside', 'sectioned', 'ciniki.marketplaces.main.market');
     this.market.data = {};
     this.market.market_id = 0;
     this.market.sections = {
@@ -73,10 +73,10 @@ function ciniki_marketplaces_main() {
             'pricelistpdf':{'label':'Download Price List (PDF)', 'fn':'M.ciniki_marketplaces_main.market.downloadPriceList(M.ciniki_marketplaces_main.market.market_id, \'pdf\');'},
             'sellers':{'label':'Seller Reports (PDF)', 'fn':'M.ciniki_marketplaces_main.market.downloadSellerSummaryy(M.ciniki_marketplaces_main.market.market_id,\'pdf\',0);'},
             }},
-        'sellers':{'label':'', 'type':'simplegrid', 'num_cols':5,
-            'headerValues':['Seller', 'Status', 'Value', 'Fees', 'Net'],
+        'sellers':{'label':'', 'type':'simplegrid', 'num_cols':6,
+            'headerValues':['Seller', 'Status', '#', 'Value', 'Fees', 'Net'],
             'cellClasses':['', ''],
-            'sortable':'yes', 'sortTypes':['text', 'text', 'altnumber', 'altnumber', 'altnumber'],
+            'sortable':'yes', 'sortTypes':['text', 'text', 'number', 'altnumber', 'altnumber', 'altnumber'],
             'noData':'No prices',
             'addTxt':'Add Seller',
             'addFn':'M.startApp(\'ciniki.customers.edit\',null,\'M.ciniki_marketplaces_main.market.open();\',\'mc\',{\'next\':\'M.ciniki_marketplaces_main.sellerAdd\',\'customer_id\':0});',
@@ -106,9 +106,10 @@ function ciniki_marketplaces_main() {
             switch(j) {
                 case 0: return d.seller.display_name;
                 case 1: return d.seller.status_text;
-                case 2: return d.seller.total_price;
-                case 3: return d.seller.total_business_fee;
-                case 4: return d.seller.total_seller_amount;
+                case 2: return d.seller.num_items;
+                case 3: return d.seller.total_price;
+                case 4: return d.seller.total_business_fee;
+                case 5: return d.seller.total_seller_amount;
             }
         }
     };
@@ -117,9 +118,10 @@ function ciniki_marketplaces_main() {
             switch(j) {
                 case 0: return d.seller.display_name;
                 case 1: return d.seller.status_text;
-                case 2: return d.seller.total_price.replace(/\$/, '');
-                case 3: return d.seller.total_business_fee.replace(/\$/, '');
-                case 4: return d.seller.total_seller_amount.replace(/\$/, '');
+                case 2: return d.seller.num_items;
+                case 3: return d.seller.total_price.replace(/\$/, '');
+                case 4: return d.seller.total_business_fee.replace(/\$/, '');
+                case 5: return d.seller.total_seller_amount.replace(/\$/, '');
             }
         }
     };
@@ -130,9 +132,10 @@ function ciniki_marketplaces_main() {
         switch(i) {
             case 0: return '';
             case 1: return '';
-            case 2: return this.data.totals.value;
-            case 3: return this.data.totals.fees;
-            case 4: return this.data.totals.net;
+            case 2: return this.data.totals.items;
+            case 3: return this.data.totals.value;
+            case 4: return this.data.totals.fees;
+            case 5: return this.data.totals.net;
         }
     }
     this.market.rowFn = function(s, i, d) {
@@ -285,6 +288,7 @@ function ciniki_marketplaces_main() {
         'info':{'label':'', 'aside':'yes', 'list':{
             'status_text':{'label':'Status'},
             'flags_text':{'label':'Options'},
+            'num_items':{'label':'# Items'},
             }},
         'reports':{'label':'', 'aside':'yes', 'list':{
             'summarypdf':{'label':'Summary (PDF)', 'fn':'M.ciniki_marketplaces_main.market.downloadSellerSummaryy(M.ciniki_marketplaces_main.market.market_id,\'pdf\',M.ciniki_marketplaces_main.seller.seller_id);'},
@@ -407,6 +411,7 @@ function ciniki_marketplaces_main() {
         'general':{'label':'General', 'fields':{
             'status':{'label':'Status', 'hint':'', 'type':'toggle', 'toggles':this.sellerStatus},
             'flags':{'label':'Options', 'hint':'', 'type':'flags', 'flags':this.sellerFlags},
+            'num_items':{'label':'# Items', 'hint':'', 'type':'text', 'size':'small'},
             }}, 
         '_notes':{'label':'Notes', 'fields':{
             'notes':{'label':'', 'hidelabel':'yes', 'type':'textarea', 'size':'small'},
@@ -677,11 +682,11 @@ function ciniki_marketplaces_main() {
     this.reportsummaries.sections = {
         'years':{'label':'', 'type':'paneltabs', 'selected':'', 'tabs':{
             }},
-        'markets':{'label':'', 'type':'simplegrid', 'num_cols':6,
-            'headerValues':['Date', 'Market', '# Items', 'Sales', 'Fees', 'Net'],
-            'cellClasses':['multiline', '', '', '', '', ''],
+        'markets':{'label':'', 'type':'simplegrid', 'num_cols':7,
+            'headerValues':['Date', 'Market', '# Items', 'Sold', 'Sales', 'Fees', 'Net'],
+            'cellClasses':['multiline', '', '', '', '', '', ''],
             'sortable':'yes',
-            'sortTypes':['date', 'text', 'number', 'number', 'number', 'number'],
+            'sortTypes':['date', 'text', 'number', 'number', 'number', 'number', 'number'],
             },
         };
     this.reportsummaries.sectionData = function(s) { return this.data[s]; }
@@ -691,9 +696,10 @@ function ciniki_marketplaces_main() {
             case 0: return '<span class="maintext">' + d.start_date + '</span><span class="subtext">' + d.end_date + '</span>';
             case 1: return d.name;
             case 2: return d.num_items;
-            case 3: return d.total_value;
-            case 4: return d.total_fees;
-            case 5: return d.total_net;
+            case 3: return d.num_sold;
+            case 4: return d.total_value;
+            case 5: return d.total_fees;
+            case 6: return d.total_net;
         }
     };
     this.reportsummaries.rowFn = function(s, i, d) {
@@ -707,9 +713,10 @@ function ciniki_marketplaces_main() {
             case 0: return '';
             case 1: return '';
             case 2: return this.data.totals.items;
-            case 3: return this.data.totals.value;
-            case 4: return this.data.totals.fees;
-            case 5: return this.data.totals.net;
+            case 3: return this.data.totals.sold;
+            case 4: return this.data.totals.value;
+            case 5: return this.data.totals.fees;
+            case 6: return this.data.totals.net;
         }
     }
     this.reportsummaries.open = function(cb, year) {

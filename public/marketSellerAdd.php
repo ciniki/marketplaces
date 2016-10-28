@@ -29,6 +29,7 @@ function ciniki_marketplaces_marketSellerAdd(&$ciniki) {
         'customer_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Customer'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'default'=>'10', 'name'=>'Status'), 
         'flags'=>array('required'=>'no', 'blank'=>'no', 'default'=>'0', 'name'=>'Options'), 
+        'num_items'=>array('required'=>'no', 'blank'=>'no', 'default'=>'0', 'name'=>'Number of Items'), 
         'notes'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'name'=>'Notes'), 
         ));
     if( $rc['stat'] != 'ok' ) {

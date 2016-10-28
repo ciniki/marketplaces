@@ -45,6 +45,7 @@ function ciniki_marketplaces_marketSellerList($ciniki) {
     //
     $strsql = "SELECT ciniki_marketplace_sellers.id, "
         . "ciniki_customers.display_name, "
+        . "ciniki_marketplace_sellers.num_items, "
         . "SUM(ciniki_marketplace_items.price) AS total_price, "
         . "SUM(ciniki_marketplace_items.sell_price) AS total_sell_price "
         . "SUM(ciniki_marketplace_items.business_fee) AS total_business_fee, "
@@ -65,8 +66,7 @@ function ciniki_marketplaces_marketSellerList($ciniki) {
         . "";
     $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
         array('container'=>'sellers', 'fname'=>'id', 'name'=>'seller',
-            'fields'=>array('id', 'display_name', 
-                'total_price', 'total_sell_price', 'total_business_fee', 'total_seller_amount')),
+            'fields'=>array('id', 'display_name', 'num_items', 'total_price', 'total_sell_price', 'total_business_fee', 'total_seller_amount')),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
