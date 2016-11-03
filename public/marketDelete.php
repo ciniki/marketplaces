@@ -51,7 +51,7 @@ function ciniki_marketplaces_marketDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['marketplace']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2110', 'msg'=>'The marketplace does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.4', 'msg'=>'The marketplace does not exist'));
     }
     $marketplace_uuid = $rc['marketplace']['uuid'];
     $marketplace_status = $rc['marketplace']['status'];
@@ -60,7 +60,7 @@ function ciniki_marketplaces_marketDelete(&$ciniki) {
     // The marketplace can only be deleted if it's first marked deleted
     //
     if( $marketplace_status < 50 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2102', 'msg'=>'The marketplace must be inactive before it can be deleted.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.5', 'msg'=>'The marketplace must be inactive before it can be deleted.'));
     }
 
     //

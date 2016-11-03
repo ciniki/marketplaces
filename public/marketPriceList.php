@@ -93,7 +93,7 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
         return $rc;
     }
     if( !isset($rc['market']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2119', 'msg'=>'Market does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.10', 'msg'=>'Market does not exist'));
     }
     $market_name = $rc['market']['name'];
 

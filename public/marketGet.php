@@ -90,7 +90,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
         return $rc;
     }
     if( !isset($rc['markets']) || !isset($rc['markets'][0]) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2106', 'msg'=>'Unable to find market'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.6', 'msg'=>'Unable to find market'));
     }
     $market = $rc['markets'][0]['market'];
 

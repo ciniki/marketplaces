@@ -94,7 +94,7 @@ function ciniki_marketplaces_marketItemGet($ciniki) {
         return $rc;
     }
     if( !isset($rc['items']) || !isset($rc['items'][0]) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2111', 'msg'=>'Unable to find item'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.9', 'msg'=>'Unable to find item'));
     }
     $item = $rc['items'][0]['item'];
 

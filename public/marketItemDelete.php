@@ -51,7 +51,7 @@ function ciniki_marketplaces_marketItemDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['item']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2098', 'msg'=>'The item does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.8', 'msg'=>'The item does not exist'));
     }
     $item_uuid = $rc['item']['uuid'];
 

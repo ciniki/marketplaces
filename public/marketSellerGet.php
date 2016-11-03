@@ -92,7 +92,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
         return $rc;
     }
     if( !isset($rc['sellers']) || !isset($rc['sellers'][0]) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2107', 'msg'=>'Unable to find seller'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.12', 'msg'=>'Unable to find seller'));
     }
     $seller = $rc['sellers'][0]['seller'];
 

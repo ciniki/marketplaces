@@ -52,7 +52,7 @@ function ciniki_marketplaces_marketSellerDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['seller']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2112', 'msg'=>'The seller does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.marketplaces.11', 'msg'=>'The seller does not exist'));
     }
     $seller_uuid = $rc['seller']['uuid'];
     $market_id = $rc['seller']['market_id'];
