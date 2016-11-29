@@ -491,9 +491,10 @@ function ciniki_marketplaces_main() {
     this.selleredit.save = function() {
         if( this.seller_id > 0 ) {
             var c = this.serializeForm('no');
-            if( this.customer_id != this.data.seller_id ) {
+            if( this.customer_id != this.data.customer_id ) {
                 c += '&customer_id=' + this.customer_id;
             }
+            console.log(c);
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.marketplaces.marketSellerUpdate', {'business_id':M.curBusinessID, 
                     'seller_id':this.seller_id}, c, function(rsp) {

@@ -27,6 +27,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Seller'), 
+        'customer_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'flags'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Options'), 
         'num_items'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Number of Items'), 
