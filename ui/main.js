@@ -494,7 +494,6 @@ function ciniki_marketplaces_main() {
             if( this.customer_id != this.data.customer_id ) {
                 c += '&customer_id=' + this.customer_id;
             }
-            console.log(c);
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.marketplaces.marketSellerUpdate', {'business_id':M.curBusinessID, 
                     'seller_id':this.seller_id}, c, function(rsp) {
