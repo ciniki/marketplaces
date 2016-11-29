@@ -124,14 +124,15 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
         . "SUM(IFNULL(ciniki_marketplace_items.business_fee, 0)) AS total_fees, "
         . "SUM(IFNULL(ciniki_marketplace_items.seller_amount, 0)) AS total_net "
         . "FROM ciniki_marketplaces "
-        . "LEFT JOIN ciniki_marketplace_sellers ON ("
-            . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
-            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-            . ") "
+//        . "LEFT JOIN ciniki_marketplace_sellers ON ("
+//            . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
+//            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+//            . ") "
         . "LEFT JOIN ciniki_marketplace_items ON ("
             . "ciniki_marketplaces.id = ciniki_marketplace_items.market_id "
             . "AND ciniki_marketplace_items.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-            . "AND ciniki_marketplace_items.sell_date <> '0000-00-00' ";
+            . "AND ciniki_marketplace_items.sell_date <> '0000-00-00' "
+            . "";
     if( isset($start_date) && isset($end_date) ) {
         $strsql .= "AND ciniki_marketplace_items.sell_date >= '" . ciniki_core_dbQuote($ciniki, $start_date) . "' "
             . "AND ciniki_marketplace_items.sell_date <= '" . ciniki_core_dbQuote($ciniki, $end_date) . "' "
