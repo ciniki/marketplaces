@@ -39,7 +39,7 @@ function ciniki_marketplaces_marketSellerDelete(&$ciniki) {
     }
 
     //
-    // Get the uuid of the marketplace to be deleted
+    // Get the uuid of the marketplace seller to be deleted
     //
     $strsql = "SELECT uuid, market_id, customer_id "
         . "FROM ciniki_marketplace_sellers "
@@ -78,7 +78,6 @@ function ciniki_marketplaces_marketSellerDelete(&$ciniki) {
     $strsql = "SELECT id, uuid "
         . "FROM ciniki_marketplace_items "
         . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-        . "AND market_id = '" . ciniki_core_dbQuote($ciniki, $args['market_id']) . "' "
         . "AND seller_id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.marketplaces', 'item');
@@ -100,10 +99,9 @@ function ciniki_marketplaces_marketSellerDelete(&$ciniki) {
     }
 
     //
-    // Remove the marketplace
+    // Remove the marketplace seller
     //
-    $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.marketplaces.seller', 
-        $args['seller_id'], $marketplace_uuid, 0x04);
+    $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.marketplaces.seller', $args['seller_id'], $seller_uuid, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
         return $rc;

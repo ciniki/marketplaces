@@ -260,7 +260,7 @@ function ciniki_marketplaces_main() {
     };
     this.marketedit.remove = function() {
         if( confirm("Are you sure you want to remove this market, it's sellers and all items and sales data?") ) {
-            M.api.getJSONCb('ciniki.marketplaces.marketedit.remove', {'business_id':M.curBusinessID, 'market_id':this.market_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.marketplaces.marketDelete', {'business_id':M.curBusinessID, 'market_id':this.market_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -501,7 +501,10 @@ function ciniki_marketplaces_main() {
                             M.api.err(rsp);
                             return false;
                         } 
-                    M.ciniki_marketplaces_main.selleredit.close();
+                        if( rsp.new_seller_id != null && rsp.new_seller_id > 0 ) {
+                            M.ciniki_marketplaces_main.seller.seller_id = rsp.new_seller_id;
+                        } 
+                        M.ciniki_marketplaces_main.selleredit.close();
                     });
             } else {
                 this.close();

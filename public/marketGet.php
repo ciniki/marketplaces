@@ -96,7 +96,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
 
     $market['dates'] = $market['start_date'];
     if( $market['end_date'] != '' ) {
-        $market['dates'] .= ' - ' . $market['end_dates'];
+        $market['dates'] .= ' - ' . $market['end_date'];
     }
 
     if( isset($args['sellers']) && $args['sellers'] == 'summary' ) {
@@ -107,10 +107,10 @@ function ciniki_marketplaces_marketGet($ciniki) {
             . "ciniki_marketplace_sellers.status, "
             . "ciniki_marketplace_sellers.status AS status_text, "
             . "ciniki_marketplace_sellers.num_items, "
-            . "ciniki_customers.display_name, "
-            . "SUM(ciniki_marketplace_items.price) AS total_price, "
-            . "SUM(ciniki_marketplace_items.business_fee) AS total_business_fee, "
-            . "SUM(ciniki_marketplace_items.seller_amount) AS total_seller_amount "
+            . "IFNULL(ciniki_customers.display_name, '') AS display_name, "
+            . "SUM(IFNULL(ciniki_marketplace_items.price, 0)) AS total_price, "
+            . "SUM(IFNULL(ciniki_marketplace_items.business_fee, 0)) AS total_business_fee, "
+            . "SUM(IFNULL(ciniki_marketplace_items.seller_amount, 0)) AS total_seller_amount "
             . "FROM ciniki_marketplace_sellers "
             . "LEFT JOIN ciniki_marketplace_items ON ("
                 . "ciniki_marketplace_sellers.id = ciniki_marketplace_items.seller_id "
