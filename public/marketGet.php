@@ -108,7 +108,7 @@ function ciniki_marketplaces_marketGet($ciniki) {
             . "ciniki_marketplace_sellers.status AS status_text, "
             . "ciniki_marketplace_sellers.num_items, "
             . "IFNULL(ciniki_customers.display_name, '') AS display_name, "
-            . "SUM(IFNULL(ciniki_marketplace_items.price, 0)) AS total_price, "
+            . "SUM(IFNULL(ciniki_marketplace_items.sell_price, 0)) AS total_price, "
             . "SUM(IFNULL(ciniki_marketplace_items.business_fee, 0)) AS total_business_fee, "
             . "SUM(IFNULL(ciniki_marketplace_items.seller_amount, 0)) AS total_seller_amount "
             . "FROM ciniki_marketplace_sellers "
