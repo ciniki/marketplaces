@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will add a new marketplace for the business.
+// This method will add a new marketplace for the tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the marketplace to.
+// tnid:     The ID of the tenant to add the marketplace to.
 // name:            The name of the marketplace.
 // status:          The status of the marketplace.
 // start_date:      (optional) The date the marketplace starts.  
@@ -24,7 +24,7 @@ function ciniki_marketplaces_marketItemBulkAdd(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Seller'), 
         'items'=>array('required'=>'yes', 'blank'=>'no', 'type'=>'json', 'name'=>'Items'),
         ));
@@ -34,10 +34,10 @@ function ciniki_marketplaces_marketItemBulkAdd(&$ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketItemBulkAdd');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketItemBulkAdd');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -58,7 +58,7 @@ function ciniki_marketplaces_marketItemBulkAdd(&$ciniki) {
     // Add each item
     //
     foreach($items as $item) {
-        $rc = ciniki_core_parseArgs($ciniki, $args['business_id'], $item, array(
+        $rc = ciniki_core_parseArgs($ciniki, $args['tnid'], $item, array(
             'code'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Code'), 
             'name'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'), 
             'type'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'name'=>'Type'), 
@@ -79,7 +79,7 @@ function ciniki_marketplaces_marketItemBulkAdd(&$ciniki) {
         // Add the marketplace to the database
         //
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-        $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.marketplaces.item', $item, 0x04);
+        $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.marketplaces.item', $item, 0x04);
         if( $rc['stat'] != 'ok' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
             return $rc;
@@ -96,11 +96,11 @@ function ciniki_marketplaces_marketItemBulkAdd(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'marketplaces');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'marketplaces');
 
     return array('stat'=>'ok');
 }

@@ -10,13 +10,13 @@
 // Returns
 // -------
 //
-function ciniki_marketplaces_templates_pricelist(&$ciniki, $business_id, $args) {
+function ciniki_marketplaces_templates_pricelist(&$ciniki, $tnid, $args) {
 
     //
-    // Load the business intl settings
+    // Load the tenant intl settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -66,7 +66,7 @@ function ciniki_marketplaces_templates_pricelist(&$ciniki, $business_id, $args) 
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
     //
-    // Figure out the header business name and address information
+    // Figure out the header tenant name and address information
     //
     $pdf->header_height = 20;
     $pdf->header_height = 30;

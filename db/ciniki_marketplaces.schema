@@ -1,14 +1,14 @@
 #
 # Description
 # -----------
-# The marketplaces table stores the marketplaces for a business.  Each marketplace is 
+# The marketplaces table stores the marketplaces for a tenant.  Each marketplace is 
 # designed to be a temporary store or market stall, with inventory from members.
 #
 # Fields
 # ------
 # id:               The ID assigned to the marketplace.
 # uuid:             The Universal Unique ID.
-# business_id:      The business the marketplace is attached to.
+# tnid:             The tenant the marketplace is attached to.
 #
 # name:             The name for the marketplaces.
 #
@@ -26,7 +26,7 @@
 create table ciniki_marketplaces (
     id int not null auto_increment,
     uuid char(36) not null,
-    business_id int not null,
+    tnid int not null,
     name varchar(150) not null,
     status tinyint unsigned not null,
     start_date date not null,
@@ -34,7 +34,7 @@ create table ciniki_marketplaces (
     date_added datetime not null,
     last_updated datetime not null,
     primary key (id),
-    index (business_id, name),
-    unique index (business_id, name),
-    index business_uuid (business_id, uuid, last_updated)
+    index (tnid, name),
+    unique index (tnid, name),
+    index tenant_uuid (tnid, uuid, last_updated)
 ) ENGINE='InnoDB', COMMENT='v1.01';

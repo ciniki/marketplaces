@@ -10,13 +10,13 @@
 // Returns
 // -------
 //
-function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $args) {
+function ciniki_marketplaces_templates_sellersummary(&$ciniki, $tnid, $args) {
 
     //
-    // Load the business intl settings
+    // Load the tenant intl settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -66,7 +66,7 @@ function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $ar
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
     //
-    // Figure out the header business name and address information
+    // Figure out the header tenant name and address information
     //
     if( isset($args['title']) ) {
         $pdf->title = $args['title'];
@@ -125,7 +125,7 @@ function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $ar
         $pdf->SetFont('');
 
         $total_sell_price = 0;
-        $total_business_fee = 0;
+        $total_tenant_fee = 0;
         $total_seller_amount = 0;
         $num_items = count($seller['items']);
         $num = 0;
@@ -135,10 +135,10 @@ function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $ar
             $code = $item['code'];
             $name = (($item['type']!=null&&$item['type']!='')?$item['type'] . ' - ':'') . $item['name'];
             $total_sell_price = bcadd($total_sell_price, $item['sell_price'], 4);
-            $total_business_fee = bcadd($total_business_fee, $item['business_fee'], 4);
+            $total_tenant_fee = bcadd($total_tenant_fee, $item['tenant_fee'], 4);
             $total_seller_amount = bcadd($total_seller_amount, $item['seller_amount'], 4);
             $sell_price = numfmt_format_currency($intl_currency_fmt, $item['sell_price'], $intl_currency);
-            $business_fee = numfmt_format_currency($intl_currency_fmt, $item['business_fee'], $intl_currency);
+            $tenant_fee = numfmt_format_currency($intl_currency_fmt, $item['tenant_fee'], $intl_currency);
             $seller_amount = numfmt_format_currency($intl_currency_fmt, $item['seller_amount'], $intl_currency);
             $nlines = $pdf->getNumLines($name, $w[1]);
             if( $nlines == 2 ) {
@@ -171,7 +171,7 @@ function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $ar
                 0, '', '', true, 0, false, true, 0, 'T', false);
             $pdf->MultiCell($w[2], $lh, $sell_price, 1, 'R', $fill, 
                 0, '', '', true, 0, false, true, 0, 'T', false);
-            $pdf->MultiCell($w[3], $lh, $business_fee, 1, 'R', $fill, 
+            $pdf->MultiCell($w[3], $lh, $tenant_fee, 1, 'R', $fill, 
                 0, '', '', true, 0, false, true, 0, 'T', false);
             $pdf->MultiCell($w[4], $lh, $seller_amount, 1, 'R', $fill, 
                 0, '', '', true, 0, false, true, 0, 'T', false);
@@ -184,14 +184,14 @@ function ciniki_marketplaces_templates_sellersummary(&$ciniki, $business_id, $ar
         // Add totals
         //
         $total_sell_price = numfmt_format_currency($intl_currency_fmt, $total_sell_price, $intl_currency);
-        $total_business_fee = numfmt_format_currency($intl_currency_fmt, $total_business_fee, $intl_currency);
+        $total_tenant_fee = numfmt_format_currency($intl_currency_fmt, $total_tenant_fee, $intl_currency);
         $total_seller_amount = numfmt_format_currency($intl_currency_fmt, $total_seller_amount, $intl_currency);
         $pdf->SetFillColor(224);
         $lh = 6;
         $pdf->SetFont('', 'B');
         $pdf->Cell($w[0] + $w[1], $lh, 'Totals', 1, 0, 'L', 1);
         $pdf->Cell($w[2], $lh, $total_sell_price, 1, 0, 'R', 1);
-        $pdf->Cell($w[3], $lh, $total_business_fee, 1, 0, 'R', 1);
+        $pdf->Cell($w[3], $lh, $total_tenant_fee, 1, 0, 'R', 1);
         $pdf->Cell($w[4], $lh, $total_seller_amount, 1, 0, 'R', 1);
         $num_seller++;
     }

@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the seller is attached to.
+// tnid:     The ID of the tenant the seller is attached to.
 // market_id:       The ID of the market to get the details for.
 // 
 // Returns
@@ -20,7 +20,7 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'market_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Market'),
         'output'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Format'),
         )); 
@@ -31,20 +31,20 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketPriceList'); 
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketPriceList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
     $modules = $rc['modules'];
 
     //
-    // Load the business intl settings
+    // Load the tenant intl settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -67,17 +67,17 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     $maps = $rc['maps'];
 
     //
-    // Load business details
+    // Load tenant details
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'businessDetails');
-    $rc = ciniki_businesses_businessDetails($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'tenantDetails');
+    $rc = ciniki_tenants_tenantDetails($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
     if( isset($rc['details']) && is_array($rc['details']) ) {
-        $business_details = $rc['details'];
+        $tenant_details = $rc['details'];
     } else {
-        $business_details = array();
+        $tenant_details = array();
     }
 
     //
@@ -86,7 +86,7 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     $strsql = "SELECT name "
         . "FROM ciniki_marketplaces "
         . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['market_id']) . "' "
-        . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.marketplaces', 'market');
     if( $rc['stat'] != 'ok' ) {
@@ -109,18 +109,18 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
         . "ciniki_marketplace_items.price, "
         . "ciniki_marketplace_items.fee_percent, "
         . "DATE_FORMAT(ciniki_marketplace_items.sell_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS sell_date, "
-        . "sell_price, business_fee, seller_amount, "
+        . "sell_price, tenant_fee, seller_amount, "
         . "ciniki_marketplace_items.notes "
         . "FROM ciniki_marketplace_items "
         . "LEFT JOIN ciniki_marketplace_sellers ON ("
             . "ciniki_marketplace_items.seller_id = ciniki_marketplace_sellers.id "
-            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_marketplace_sellers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customers ON ("
             . "ciniki_marketplace_sellers.customer_id = ciniki_customers.id "
-            . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
-        . "WHERE ciniki_marketplace_items.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_marketplace_items.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_marketplace_items.market_id = '" . ciniki_core_dbQuote($ciniki, $args['market_id']) . "' "
         . "ORDER BY code, name "
         . "";
@@ -128,7 +128,7 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.marketplaces', array(
         array('container'=>'items', 'fname'=>'id',
             'fields'=>array('id', 'display_name', 'code', 'name', 'type', 'category', 
-                'price', 'fee_percent', 'sell_date', 'sell_price', 'business_fee', 'seller_amount', 'notes')),
+                'price', 'fee_percent', 'sell_date', 'sell_price', 'tenant_fee', 'seller_amount', 'notes')),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -142,9 +142,9 @@ function ciniki_marketplaces_marketPriceList($ciniki) {
     $today = new DateTime('now', new DateTimeZone($intl_timezone));
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'templates', 'pricelist');
-    $rc = ciniki_marketplaces_templates_pricelist($ciniki, $args['business_id'], array(
+    $rc = ciniki_marketplaces_templates_pricelist($ciniki, $args['tnid'], array(
         'title'=>$market_name . ' - Price List',
-        'author'=>$business_details['name'],
+        'author'=>$tenant_details['name'],
         'footer'=>$today->format('M d, Y'),
         'items'=>$items,
         ));

@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the marketplace is attached to.
+// tnid:     The ID of the tenant the marketplace is attached to.
 // name:            (optional) The new name of the marketplace.
 // url:             (optional) The new URL for the marketplace website.
 // description:     (optional) The new description for the marketplace.
@@ -25,7 +25,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Seller'), 
         'customer_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
@@ -40,10 +40,10 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketSellerUpdate'); 
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketSellerUpdate'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -53,7 +53,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
     //
     $strsql = "SELECT uuid, market_id, customer_id, status, flags "
         . "FROM ciniki_marketplace_sellers "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.marketplaces', 'seller');
@@ -88,7 +88,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
         //
         $strsql = "SELECT id, market_id, customer_id, status, flags "
             . "FROM ciniki_marketplace_sellers "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND id <> '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
             . "AND market_id = '" . ciniki_core_dbQuote($ciniki, $seller['market_id']) . "' "
             . "AND customer_id = '" . ciniki_core_dbQuote($ciniki, $args['customer_id']) . "' "
@@ -105,7 +105,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
             //
             $strsql = "SELECT id, seller_id, market_id "
                 . "FROM ciniki_marketplace_items "
-                . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND market_id = '" . ciniki_core_dbQuote($ciniki, $seller['market_id']) . "' "
                 . "AND seller_id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
                 . "";
@@ -116,7 +116,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
             }
             if( isset($rc['rows']) ) {
                 foreach($rc['rows'] as $row) {
-                    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.marketplaces.item', $row['id'], array(
+                    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.marketplaces.item', $row['id'], array(
                         'seller_id'=>$new_seller['id']
                         ), 0x04);
                     if( $rc['stat'] != 'ok' ) {
@@ -128,7 +128,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
             //
             // Remove the old seller
             //
-            $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.marketplaces.seller', $args['seller_id'], $seller['uuid'], 0x04);
+            $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.marketplaces.seller', $args['seller_id'], $seller['uuid'], 0x04);
             if( $rc['stat'] != 'ok' ) {
                 ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
                 return $rc;
@@ -143,7 +143,7 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
         //
         // Update the marketplace in the database
         //
-        $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.marketplaces.seller', $args['seller_id'], $args, 0x04);
+        $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.marketplaces.seller', $args['seller_id'], $args, 0x04);
         if( $rc['stat'] != 'ok' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
             return $rc;
@@ -159,11 +159,11 @@ function ciniki_marketplaces_marketSellerUpdate(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'marketplaces');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'marketplaces');
 
     if( isset($new_seller) ) {
         return array('stat'=>'ok', 'new_seller_id'=>$new_seller['id']);

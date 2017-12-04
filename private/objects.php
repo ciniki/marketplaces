@@ -53,7 +53,7 @@ function ciniki_marketplaces_objects($ciniki) {
             'fee_percent'=>array('name'=>'Fee'),
             'sell_date'=>array('name'=>'Sell Date', 'default'=>''),
             'sell_price'=>array('name'=>'Sell Price', 'default'=>''),
-            'business_fee'=>array('name'=>'Business Fee', 'default'=>''),
+            'tenant_fee'=>array('name'=>'Tenant Fee', 'default'=>''),
             'seller_amount'=>array('name'=>'Seller Amount', 'default'=>''),
             'notes'=>array('name'=>'Notes', 'default'=>''),
             ),

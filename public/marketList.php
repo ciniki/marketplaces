@@ -2,14 +2,14 @@
 //
 // Description
 // -----------
-// This method will return the list of marketplaces for a business.  It is restricted
-// to business owners and sysadmins.
+// This method will return the list of marketplaces for a tenant.  It is restricted
+// to tenant owners and sysadmins.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get marketplaces for.
+// tnid:     The ID of the tenant to get marketplaces for.
 //
 // Returns
 // -------
@@ -20,7 +20,7 @@ function ciniki_marketplaces_marketList($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -28,10 +28,10 @@ function ciniki_marketplaces_marketList($ciniki) {
     $args = $rc['args'];
     
     //  
-    // Check access to business_id as owner, or sys admin. 
+    // Check access to tnid as owner, or sys admin. 
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketList');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketList');
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -44,7 +44,7 @@ function ciniki_marketplaces_marketList($ciniki) {
     //
     $strsql = "SELECT id, name, status, start_date, end_date "
         . "FROM ciniki_marketplaces "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "ORDER BY ciniki_marketplaces.start_date DESC "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');

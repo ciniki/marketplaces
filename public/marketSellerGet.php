@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the seller is attached to.
+// tnid:     The ID of the tenant the seller is attached to.
 // market_id:       The ID of the market to get the details for.
 // 
 // Returns
@@ -20,7 +20,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Seller'),
         'items'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Items'),
         )); 
@@ -31,20 +31,20 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketSellerGet'); 
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketSellerGet'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
     $modules = $rc['modules'];
 
     //
-    // Load the business intl settings
+    // Load the tenant intl settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -78,7 +78,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
         . "ciniki_marketplace_sellers.flags AS flags_text, "
         . "ciniki_marketplace_sellers.num_items "
         . "FROM ciniki_marketplace_sellers "
-        . "WHERE ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_marketplace_sellers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_marketplace_sellers.id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
@@ -101,7 +101,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
     //
     if( $seller['customer_id'] > 0 ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
-        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], array(
+        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['tnid'], array(
             'customer_id'=>$seller['customer_id'], 
             'phones'=>'yes', 
             'emails'=>'yes', 
@@ -130,18 +130,18 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
             . "ciniki_marketplace_items.fee_percent, "
             . "DATE_FORMAT(ciniki_marketplace_items.sell_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS sell_date, "
             . "IF(ciniki_marketplace_items.sell_price=0, '', ciniki_marketplace_items.sell_price) AS sell_price, "
-            . "IF(ciniki_marketplace_items.business_fee=0, '', ciniki_marketplace_items.business_fee) AS business_fee, "
+            . "IF(ciniki_marketplace_items.tenant_fee=0, '', ciniki_marketplace_items.tenant_fee) AS tenant_fee, "
             . "IF(ciniki_marketplace_items.seller_amount=0, '', ciniki_marketplace_items.seller_amount) AS seller_amount, "
             . "ciniki_marketplace_items.notes "
             . "FROM ciniki_marketplace_items "
-            . "WHERE ciniki_marketplace_items.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_marketplace_items.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_marketplace_items.seller_id = '" . ciniki_core_dbQuote($ciniki, $args['seller_id']) . "' "
             . "ORDER BY code, name "
             . "";
         $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.marketplaces', array(
             array('container'=>'items', 'fname'=>'id', 'name'=>'item',
                 'fields'=>array('id', 'code', 'name', 'type', 'category', 
-                    'price', 'fee_percent', 'sell_date', 'sell_price', 'business_fee', 'seller_amount', 'notes')),
+                    'price', 'fee_percent', 'sell_date', 'sell_price', 'tenant_fee', 'seller_amount', 'notes')),
             ));
         if( $rc['stat'] != 'ok' ) {
             return $rc;
@@ -150,7 +150,7 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
             $seller['items'] = array();
         } else {
             $seller['items'] = $rc['items'];
-            $seller['item_totals'] = array('price'=>0, 'sell_price'=>0, 'business_fee'=>0, 'seller_amount'=>0);
+            $seller['item_totals'] = array('price'=>0, 'sell_price'=>0, 'tenant_fee'=>0, 'seller_amount'=>0);
             foreach($seller['items'] as $iid => $item) {
                 $seller['items'][$iid]['item']['fee_percent'] = (float)$item['item']['fee_percent'];
                 if( $item['item']['price'] != '' ) {
@@ -163,10 +163,10 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
                         $item['item']['sell_price'], $intl_currency);
                     $seller['item_totals']['sell_price'] = bcadd($seller['item_totals']['sell_price'], $item['item']['sell_price'], 4);
                 }
-                if( $item['item']['business_fee'] != '' ) {
-                    $seller['items'][$iid]['item']['business_fee'] = numfmt_format_currency($intl_currency_fmt, 
-                        $item['item']['business_fee'], $intl_currency);
-                    $seller['item_totals']['business_fee'] = bcadd($seller['item_totals']['business_fee'], $item['item']['business_fee'], 4);
+                if( $item['item']['tenant_fee'] != '' ) {
+                    $seller['items'][$iid]['item']['tenant_fee'] = numfmt_format_currency($intl_currency_fmt, 
+                        $item['item']['tenant_fee'], $intl_currency);
+                    $seller['item_totals']['tenant_fee'] = bcadd($seller['item_totals']['tenant_fee'], $item['item']['tenant_fee'], 4);
                 }
                 if( $item['item']['seller_amount'] != '' ) {
                     $seller['items'][$iid]['item']['seller_amount'] = numfmt_format_currency($intl_currency_fmt, 
@@ -178,8 +178,8 @@ function ciniki_marketplaces_marketSellerGet($ciniki) {
                 $seller['item_totals']['price'], $intl_currency);
             $seller['item_totals']['sell_price'] = numfmt_format_currency($intl_currency_fmt,
                 $seller['item_totals']['sell_price'], $intl_currency);
-            $seller['item_totals']['business_fee'] = numfmt_format_currency($intl_currency_fmt,
-                $seller['item_totals']['business_fee'], $intl_currency);
+            $seller['item_totals']['tenant_fee'] = numfmt_format_currency($intl_currency_fmt,
+                $seller['item_totals']['tenant_fee'], $intl_currency);
             $seller['item_totals']['seller_amount'] = numfmt_format_currency($intl_currency_fmt,
                 $seller['item_totals']['seller_amount'], $intl_currency);
         }

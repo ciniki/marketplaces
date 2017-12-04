@@ -7,7 +7,7 @@
 # ------
 # id:               The ID assigned to the marketplace.
 # uuid:             The Universal Unique ID.
-# business_id:      The business the marketplace is attached to.
+# tnid:             The tenant the marketplace is attached to.
 #
 # market_id:        The ID of the marketplace.
 # customer_id:      The ID of the customer/member the item is from.
@@ -35,7 +35,7 @@
 create table ciniki_marketplace_sellers (
     id int not null auto_increment,
     uuid char(36) not null,
-    business_id int not null,
+    tnid int not null,
     market_id int not null,
     customer_id int not null,
     status tinyint unsigned not null,
@@ -46,5 +46,5 @@ create table ciniki_marketplace_sellers (
     last_updated datetime not null,
     primary key (id),
     unique index (market_id, customer_id),
-    index business_uuid (business_id, uuid, last_updated)
+    index tenant_uuid (tnid, uuid, last_updated)
 ) ENGINE='InnoDB', COMMENT='v1.02';

@@ -2,14 +2,14 @@
 //
 // Description
 // -----------
-// This method will return the list of marketplaces for a business.  It is restricted
-// to business owners and sysadmins.
+// This method will return the list of marketplaces for a tenant.  It is restricted
+// to tenant owners and sysadmins.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get marketplaces for.
+// tnid:     The ID of the tenant to get marketplaces for.
 //
 // Returns
 // -------
@@ -20,7 +20,7 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'year'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Year'), 
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -29,19 +29,19 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
     $args = $rc['args'];
     
     //  
-    // Check access to business_id as owner, or sys admin. 
+    // Check access to tnid as owner, or sys admin. 
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketSummaries');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketSummaries');
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
 
     //
-    // Load the business intl settings
+    // Load the tenant intl settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -62,7 +62,7 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
     //
     $strsql = "SELECT DISTINCT DATE_FORMAT(start_date, '%Y') AS year "
         . "FROM ciniki_marketplaces "
-        . "WHERE ciniki_marketplaces.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_marketplaces.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "ORDER BY start_date "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
@@ -84,9 +84,9 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
         . "FROM ciniki_marketplaces "
         . "LEFT JOIN ciniki_marketplace_sellers ON ("
             . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
-            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_marketplace_sellers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
-        . "WHERE ciniki_marketplaces.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+        . "WHERE ciniki_marketplaces.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
     if( isset($start_date) && isset($end_date) ) {
         $strsql .= "AND ((ciniki_marketplaces.start_date >= '" . ciniki_core_dbQuote($ciniki, $start_date) . "' "
             . "AND ciniki_marketplaces.start_date <= '" . ciniki_core_dbQuote($ciniki, $end_date) . "' "
@@ -121,16 +121,16 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
         . "ciniki_marketplaces.end_date, "
         . "COUNT(ciniki_marketplace_items.id) AS num_sold, "
         . "SUM(IFNULL(ciniki_marketplace_items.sell_price, 0)) AS total_value, "
-        . "SUM(IFNULL(ciniki_marketplace_items.business_fee, 0)) AS total_fees, "
+        . "SUM(IFNULL(ciniki_marketplace_items.tenant_fee, 0)) AS total_fees, "
         . "SUM(IFNULL(ciniki_marketplace_items.seller_amount, 0)) AS total_net "
         . "FROM ciniki_marketplaces "
 //        . "LEFT JOIN ciniki_marketplace_sellers ON ("
 //            . "ciniki_marketplaces.id = ciniki_marketplace_sellers.market_id "
-//            . "AND ciniki_marketplace_sellers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+//            . "AND ciniki_marketplace_sellers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
 //            . ") "
         . "LEFT JOIN ciniki_marketplace_items ON ("
             . "ciniki_marketplaces.id = ciniki_marketplace_items.market_id "
-            . "AND ciniki_marketplace_items.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_marketplace_items.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_marketplace_items.sell_date <> '0000-00-00' "
             . "";
     if( isset($start_date) && isset($end_date) ) {
@@ -139,7 +139,7 @@ function ciniki_marketplaces_marketSummaries($ciniki) {
             . "";
     }
     $strsql .= ") "
-        . "WHERE ciniki_marketplaces.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+        . "WHERE ciniki_marketplaces.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
     if( isset($start_date) && isset($end_date) ) {
         $strsql .= "AND ((ciniki_marketplaces.start_date >= '" . ciniki_core_dbQuote($ciniki, $start_date) . "' "
             . "AND ciniki_marketplaces.start_date <= '" . ciniki_core_dbQuote($ciniki, $end_date) . "' "

@@ -10,7 +10,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to get the details for.
+// tnid:         The ID of the tenant to get the details for.
 // market_id:           The ID of the marketplace to get the history for.
 // field:               The field to get the history for. This can be any of the elements 
 //                      returned by the ciniki.marketplaces.get method.
@@ -28,7 +28,7 @@ function ciniki_marketplaces_marketSellerHistory($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'seller_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Market Seller'), 
         'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'), 
         ));
@@ -38,15 +38,15 @@ function ciniki_marketplaces_marketSellerHistory($ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner, or sys admin
+    // Check access to tnid as owner, or sys admin
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketSellerHistory');
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketSellerHistory');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
-    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['business_id'], 'ciniki_marketplace_sellers', $args['seller_id'], $args['field']);
+    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.marketplaces', 'ciniki_marketplace_history', $args['tnid'], 'ciniki_marketplace_sellers', $args['seller_id'], $args['field']);
 }
 ?>

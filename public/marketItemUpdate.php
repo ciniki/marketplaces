@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the marketplace is attached to.
+// tnid:     The ID of the tenant the marketplace is attached to.
 // name:            (optional) The new name of the marketplace.
 // url:             (optional) The new URL for the marketplace website.
 // description:     (optional) The new description for the marketplace.
@@ -25,7 +25,7 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'item_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Item'), 
         'code'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Code'), 
         'name'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Name'), 
@@ -35,7 +35,7 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
         'fee_percent'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Fee Percent'), 
         'sell_date'=>array('required'=>'no', 'blank'=>'no', 'type'=>'date', 'name'=>'Sell Date'), 
         'sell_price'=>array('required'=>'no', 'blank'=>'no', 'type'=>'currency', 'name'=>'Sell Price'), 
-        'business_fee'=>array('required'=>'no', 'blank'=>'no', 'type'=>'currency', 'name'=>'Business Fee'), 
+        'tenant_fee'=>array('required'=>'no', 'blank'=>'no', 'type'=>'currency', 'name'=>'Tenant Fee'), 
         'seller_amount'=>array('required'=>'no', 'blank'=>'no', 'type'=>'currency', 'name'=>'Seller Amount'), 
         'notes'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Notes'), 
         )); 
@@ -46,10 +46,10 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'marketplaces', 'private', 'checkAccess');
-    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['business_id'], 'ciniki.marketplaces.marketItemUpdate'); 
+    $rc = ciniki_marketplaces_checkAccess($ciniki, $args['tnid'], 'ciniki.marketplaces.marketItemUpdate'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -70,7 +70,7 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
     // Update the marketplace in the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.marketplaces.item', $args['item_id'], $args, 0x04);
+    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.marketplaces.item', $args['item_id'], $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.marketplaces');
         return $rc;
@@ -85,11 +85,11 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'marketplaces');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'marketplaces');
 
     return array('stat'=>'ok');
 }

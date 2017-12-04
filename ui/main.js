@@ -1,5 +1,5 @@
 //
-// This app will handle the listing, additions and deletions of markets.  These are associated business.
+// This app will handle the listing, additions and deletions of markets.  These are associated tenant.
 //
 function ciniki_marketplaces_main() {
     //
@@ -43,7 +43,7 @@ function ciniki_marketplaces_main() {
     };
     this.menu.open = function(cb) {
         this.data = {};
-        M.api.getJSONCb('ciniki.marketplaces.marketList', {'business_id':M.curBusinessID}, function(rsp) {
+        M.api.getJSONCb('ciniki.marketplaces.marketList', {'tnid':M.curTenantID}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -108,7 +108,7 @@ function ciniki_marketplaces_main() {
                 case 1: return d.seller.status_text;
                 case 2: return d.seller.num_items;
                 case 3: return d.seller.total_price;
-                case 4: return d.seller.total_business_fee;
+                case 4: return d.seller.total_tenant_fee;
                 case 5: return d.seller.total_seller_amount;
             }
         }
@@ -120,7 +120,7 @@ function ciniki_marketplaces_main() {
                 case 1: return d.seller.status_text;
                 case 2: return d.seller.num_items;
                 case 3: return d.seller.total_price.replace(/\$/, '');
-                case 4: return d.seller.total_business_fee.replace(/\$/, '');
+                case 4: return d.seller.total_tenant_fee.replace(/\$/, '');
                 case 5: return d.seller.total_seller_amount.replace(/\$/, '');
             }
         }
@@ -144,7 +144,7 @@ function ciniki_marketplaces_main() {
     this.market.open = function(cb, mid) {
         this.reset();
         if( mid != null ) { this.market_id = mid; }
-        var rsp = M.api.getJSONCb('ciniki.marketplaces.marketGet', {'business_id':M.curBusinessID, 
+        var rsp = M.api.getJSONCb('ciniki.marketplaces.marketGet', {'tnid':M.curTenantID, 
             'market_id':this.market_id, 'sellers':'summary'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -157,16 +157,16 @@ function ciniki_marketplaces_main() {
             });
     };
     this.market.downloadInventory = function(mid, format) {
-        var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
+        var args = {'tnid':M.curTenantID, 'market_id':mid, 'output':format};
         M.api.openPDF('ciniki.marketplaces.marketInventory', args);
     };
 
     this.market.downloadPriceList = function(mid, format) {
-        var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
+        var args = {'tnid':M.curTenantID, 'market_id':mid, 'output':format};
         M.api.openPDF('ciniki.marketplaces.marketPriceList', args);
     };
     this.market.downloadSellerSummaryy = function(mid, format, sid) {
-        var args = {'business_id':M.curBusinessID, 'market_id':mid, 'output':format};
+        var args = {'tnid':M.curTenantID, 'market_id':mid, 'output':format};
         if( sid != null && sid > 0 ) {
             args.seller_id = sid;
         }
@@ -198,7 +198,7 @@ function ciniki_marketplaces_main() {
         };  
     this.marketedit.fieldValue = function(s, i, d) { return this.data[i]; }
     this.marketedit.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.marketplaces.marketHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.marketplaces.marketHistory', 'args':{'tnid':M.curTenantID, 
             'market_id':this.market_id, 'field':i}};
     }
     this.marketedit.open = function(cb, mid) {
@@ -207,7 +207,7 @@ function ciniki_marketplaces_main() {
         this.sections._buttons.buttons.delete.visible = 'no';
 
         if( this.market_id > 0 ) {
-            M.api.getJSONCb('ciniki.marketplaces.marketGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.marketplaces.marketGet', {'tnid':M.curTenantID, 
                 'market_id':this.market_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -230,7 +230,7 @@ function ciniki_marketplaces_main() {
         if( this.market_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.marketplaces.marketUpdate', {'business_id':M.curBusinessID, 'market_id':this.market_id}, c, function(rsp) {
+                M.api.postJSONCb('ciniki.marketplaces.marketUpdate', {'tnid':M.curTenantID, 'market_id':this.market_id}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -243,7 +243,7 @@ function ciniki_marketplaces_main() {
         } else {
             var c = this.serializeForm('yes');
             M.api.postJSONCb('ciniki.marketplaces.marketAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -260,7 +260,7 @@ function ciniki_marketplaces_main() {
     };
     this.marketedit.remove = function() {
         if( confirm("Are you sure you want to remove this market, it's sellers and all items and sales data?") ) {
-            M.api.getJSONCb('ciniki.marketplaces.marketDelete', {'business_id':M.curBusinessID, 'market_id':this.market_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.marketplaces.marketDelete', {'tnid':M.curTenantID, 'market_id':this.market_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -336,7 +336,7 @@ function ciniki_marketplaces_main() {
                 case 2: return d.item.price;
                 case 3: return d.item.fee_percent;
                 case 4: return d.item.sell_date;
-                case 5: return d.item.business_fee;
+                case 5: return d.item.tenant_fee;
                 case 6: return d.item.seller_amount;
             }
         }
@@ -346,7 +346,7 @@ function ciniki_marketplaces_main() {
             switch(j) {
                 case 0: return d.item.code;
                 case 2: return d.item.price.replace(/\$/, '');
-                case 5: return d.item.business_fee.replace(/\$/, '');
+                case 5: return d.item.tenant_fee.replace(/\$/, '');
                 case 6: return d.item.seller_amount.replace(/\$/, '');
             }
         }
@@ -365,7 +365,7 @@ function ciniki_marketplaces_main() {
                 case 2: return this.data.item_totals.price;
                 case 3: return '';
                 case 4: return '';
-                case 5: return this.data.item_totals.business_fee;
+                case 5: return this.data.item_totals.tenant_fee;
                 case 6: return this.data.item_totals.seller_amount;
             }
         }
@@ -373,7 +373,7 @@ function ciniki_marketplaces_main() {
     this.seller.open = function(cb, sid) {
         this.reset();
         if( sid != null ) { this.seller_id = sid; }
-        var rsp = M.api.getJSONCb('ciniki.marketplaces.marketSellerGet', {'business_id':M.curBusinessID, 
+        var rsp = M.api.getJSONCb('ciniki.marketplaces.marketSellerGet', {'tnid':M.curTenantID, 
             'seller_id':this.seller_id, 'items':'yes'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -424,7 +424,7 @@ function ciniki_marketplaces_main() {
     this.selleredit.sectionData = function(s) { return this.data[s]; }
     this.selleredit.fieldValue = function(s, i, d) { return this.data[i]; }
     this.selleredit.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.marketplaces.marketSellerHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.marketplaces.marketSellerHistory', 'args':{'tnid':M.curTenantID, 
             'seller_id':this.seller_id, 'field':i}};
     }
     this.selleredit.cellValue = function(s, i, j, d) {
@@ -438,7 +438,7 @@ function ciniki_marketplaces_main() {
     this.selleredit.updateCustomer = function(cid) {
         if( cid != null && this.customer_id != cid ) { this.customer_id = cid; }
         if( this.customer_id > 0 ) {
-            M.api.getJSONCb('ciniki.customers.customerDetails', {'business_id':M.curBusinessID, 'customer_id':this.customer_id, 
+            M.api.getJSONCb('ciniki.customers.customerDetails', {'tnid':M.curTenantID, 'customer_id':this.customer_id, 
                 'phones':'yes', 'emails':'yes', 'addresses':'yes'}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -462,7 +462,7 @@ function ciniki_marketplaces_main() {
             this.sections._buttons.buttons.delete.visible = 'yes';
             this.sections.customer_details.addTxt = 'Edit';
             this.sections.customer_details.changeTxt = 'Change Seller';
-            M.api.getJSONCb('ciniki.marketplaces.marketSellerGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.marketplaces.marketSellerGet', {'tnid':M.curTenantID, 
                 'seller_id':this.seller_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -475,7 +475,7 @@ function ciniki_marketplaces_main() {
                     p.show(cb);
                 });
         } else if( this.customer_id > 0 ) {
-            M.api.getJSONCb('ciniki.customers.customerDetails', {'business_id':M.curBusinessID,
+            M.api.getJSONCb('ciniki.customers.customerDetails', {'tnid':M.curTenantID,
                 'customer_id':this.customer_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -495,7 +495,7 @@ function ciniki_marketplaces_main() {
                 c += '&customer_id=' + this.customer_id;
             }
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.marketplaces.marketSellerUpdate', {'business_id':M.curBusinessID, 
+                M.api.postJSONCb('ciniki.marketplaces.marketSellerUpdate', {'tnid':M.curTenantID, 
                     'seller_id':this.seller_id}, c, function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -514,7 +514,7 @@ function ciniki_marketplaces_main() {
             c += '&market_id=' + this.market_id;
             c += '&customer_id=' + this.customer_id;
             M.api.postJSONCb('ciniki.marketplaces.marketSellerAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -532,7 +532,7 @@ function ciniki_marketplaces_main() {
     this.selleredit.remove = function() {
         if( confirm("Are you sure you want to remove this seller, it's sellers and all items and sales data?") ) {
             M.api.getJSONCb('ciniki.marketplaces.marketSellerDelete', 
-                {'business_id':M.curBusinessID, 'seller_id':M.ciniki_marketplaces_main.seller.seller_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'seller_id':M.ciniki_marketplaces_main.seller.seller_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -563,7 +563,7 @@ function ciniki_marketplaces_main() {
             'fee_percent':{'label':'Fee %', 'hint':'', 'type':'text', 'size':'small', 'onchangeFn':'M.ciniki_marketplaces_main.itemedit.calc'},
             'sell_date':{'label':'Sell Date', 'hint':'', 'type':'date', 'onchangeFn':'M.ciniki_marketplaces_main.itemedit.calc'},
             'sell_price':{'label':'Sell Price', 'hint':'', 'type':'text', 'size':'small', 'onchangeFn':'M.ciniki_marketplaces_main.itemedit.calc'},
-            'business_fee':{'label':'Business Fee', 'hint':'', 'type':'text', 'size':'small'},
+            'tenant_fee':{'label':'Tenant Fee', 'hint':'', 'type':'text', 'size':'small'},
             'seller_amount':{'label':'Seller Amount', 'hint':'', 'type':'text', 'size':'small'},
             }}, 
         '_notes':{'label':'Notes', 'fields':{
@@ -576,7 +576,7 @@ function ciniki_marketplaces_main() {
         };  
     this.itemedit.fieldValue = function(s, i, d) { return this.data[i]; }
     this.itemedit.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.marketplaces.marketItemHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.marketplaces.marketItemHistory', 'args':{'tnid':M.curTenantID, 
             'item_id':this.item_id, 'field':i}};
     }
     this.itemedit.calc = function(s, i) {
@@ -589,7 +589,7 @@ function ciniki_marketplaces_main() {
             sell_price = price;
         }
         var fee_percent = parseFloat(this.formFieldValue(this.sections[s].fields['fee_percent'], 'fee_percent'));
-        var business_fee = this.formFieldValue(this.sections[s].fields['business_fee'], 'business_fee');
+        var tenant_fee = this.formFieldValue(this.sections[s].fields['tenant_fee'], 'tenant_fee');
         var seller_amount = this.formFieldValue(this.sections[s].fields['seller_amount'], 'seller_amount');
         var sp = parseFloat(sell_price.replace(/\$/,''));
         bf = 0;
@@ -597,7 +597,7 @@ function ciniki_marketplaces_main() {
             bf = (sp * (fee_percent/100));
             bf = bf.toFixed(2);
         } 
-        this.setFieldValue('business_fee', '$' + bf);
+        this.setFieldValue('tenant_fee', '$' + bf);
         this.setFieldValue('seller_amount', '$' + (sp - bf).toFixed(2));
     };
     this.itemedit.open = function(cb, iid, sid) {
@@ -607,7 +607,7 @@ function ciniki_marketplaces_main() {
         this.sections._buttons.buttons.delete.visible = 'no';
         if( this.item_id > 0 ) {
             this.sections._buttons.buttons.delete.visible = 'yes';
-            M.api.getJSONCb('ciniki.marketplaces.marketItemGet', {'business_id':M.curBusinessID, 'item_id':this.item_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.marketplaces.marketItemGet', {'tnid':M.curTenantID, 'item_id':this.item_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -626,7 +626,7 @@ function ciniki_marketplaces_main() {
         if( this.item_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.marketplaces.marketItemUpdate', {'business_id':M.curBusinessID, 'item_id':this.item_id}, c, function(rsp) {
+                M.api.postJSONCb('ciniki.marketplaces.marketItemUpdate', {'tnid':M.curTenantID, 'item_id':this.item_id}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -640,7 +640,7 @@ function ciniki_marketplaces_main() {
             var c = this.serializeForm('yes');
             c += '&market_id=' + M.ciniki_marketplaces_main.seller.market_id;
             c += '&seller_id=' + this.seller_id;
-            M.api.postJSONCb('ciniki.marketplaces.marketItemAdd', {'business_id':M.curBusinessID}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.marketplaces.marketItemAdd', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -652,7 +652,7 @@ function ciniki_marketplaces_main() {
     this.itemedit.remove = function() {
         if( confirm("Are you sure you want to remove this item?") ) {
             M.api.getJSONCb('ciniki.marketplaces.marketItemDelete', 
-                {'business_id':M.curBusinessID, 'item_id':M.ciniki_marketplaces_main.itemedit.item_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'item_id':M.ciniki_marketplaces_main.itemedit.item_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -725,7 +725,7 @@ function ciniki_marketplaces_main() {
     this.reportsummaries.open = function(cb, year) {
         this.data = {};
         if( year != null ) { this.sections.years.selected = year; }
-        M.api.getJSONCb('ciniki.marketplaces.marketSummaries', {'business_id':M.curBusinessID, 'year':this.sections.years.selected}, function(rsp) {
+        M.api.getJSONCb('ciniki.marketplaces.marketSummaries', {'tnid':M.curTenantID, 'year':this.sections.years.selected}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -767,7 +767,7 @@ function ciniki_marketplaces_main() {
 
         this.menu.rightbuttons = {}; 
         this.menu.addButton('add', 'Add', 'M.ciniki_marketplaces_main.marketedit.open(\'M.ciniki_marketplaces_main.menu.open();\',0);');
-        if( (M.userPerms&0x01) > 0 || M.curBusiness.permissions.owners == 'yes' ) {
+        if( (M.userPerms&0x01) > 0 || M.curTenant.permissions.owners == 'yes' ) {
             this.menu.addButton('tools', 'Tools', 'M.ciniki_marketplaces_main.tools.open(\'M.ciniki_marketplaces_main.menu.open();\');');
         }
         this.menu.open(cb);
