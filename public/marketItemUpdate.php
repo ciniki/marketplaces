@@ -43,7 +43,7 @@ function ciniki_marketplaces_marketItemUpdate(&$ciniki) {
         return $rc;
     }   
     $args = $rc['args'];
-    
+
     //  
     // Make sure this module is activated, and
     // check permission to run this function for this tenant

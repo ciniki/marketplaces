@@ -22,7 +22,7 @@
 # fee_percent:      The percentage of the sell price
 # sell_date:        The date the item sold.
 # sell_price:       The price the item sold for.  This is used for discounts of bulk items.
-# tenant_fee:     The fee/commission charged on the sale, the part the tenant keeps.
+# tenant_fee:       The fee/commission charged on the sale, the part the tenant keeps.
 # seller_amount:    The amount to be paid to the seller.
 #
 # primary_image_id: The ID of the image to show in listings and top of item page. **future**
