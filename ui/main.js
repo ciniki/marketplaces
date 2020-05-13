@@ -39,6 +39,7 @@ function ciniki_marketplaces_main() {
         }
     };
     this.menu.rowFn = function(s, i, d) {
+        if( d == null ) { return ''; }
         return 'M.ciniki_marketplaces_main.market.open(\'M.ciniki_marketplaces_main.menu.open();\',\'' + d.id + '\');';
     };
     this.menu.open = function(cb) {
@@ -139,6 +140,7 @@ function ciniki_marketplaces_main() {
         }
     }
     this.market.rowFn = function(s, i, d) {
+        if( d == null ) { return ''; }
         return 'M.ciniki_marketplaces_main.seller.open(\'M.ciniki_marketplaces_main.market.open();\',\'' + d.seller.id + '\');';
     };
     this.market.open = function(cb, mid) {
@@ -352,6 +354,7 @@ function ciniki_marketplaces_main() {
         }
     };
     this.seller.rowFn = function(s, i, d) {
+        if( d == null ) { return ''; }
         if( s == 'items' ) {
             return 'M.ciniki_marketplaces_main.itemedit.open(\'M.ciniki_marketplaces_main.seller.open();\',\'' + d.item.id + '\',0);';
         }
@@ -706,6 +709,7 @@ function ciniki_marketplaces_main() {
         }
     };
     this.reportsummaries.rowFn = function(s, i, d) {
+        if( d == null ) { return ''; }
         return 'M.ciniki_marketplaces_main.market.open(\'M.ciniki_marketplaces_main.reportsummaries.open();\',\'' + d.id + '\');';
     };
     this.reportsummaries.footerValue = function(s, i, d) {
