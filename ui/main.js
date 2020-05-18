@@ -261,15 +261,15 @@ function ciniki_marketplaces_main() {
         }
     };
     this.marketedit.remove = function() {
-        if( confirm("Are you sure you want to remove this market, it's sellers and all items and sales data?") ) {
-            M.api.getJSONCb('ciniki.marketplaces.marketDelete', {'tnid':M.curTenantID, 'market_id':this.market_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove this market, it's sellers and all items and sales data?",null,function() {
+            M.api.getJSONCb('ciniki.marketplaces.marketDelete', {'tnid':M.curTenantID, 'market_id':M.ciniki_marketplaces_main.marketedit.market_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_marketplaces_main.market.close();
             });
-        }
+        });
     }
     this.marketedit.addButton('save', 'Save', 'M.ciniki_marketplaces_main.marketedit.save();');
     this.marketedit.addClose('Cancel');
@@ -533,7 +533,7 @@ function ciniki_marketplaces_main() {
         }
     };
     this.selleredit.remove = function() {
-        if( confirm("Are you sure you want to remove this seller, it's sellers and all items and sales data?") ) {
+        M.confirm("Are you sure you want to remove this seller, it's sellers and all items and sales data?",null,function() {
             M.api.getJSONCb('ciniki.marketplaces.marketSellerDelete', 
                 {'tnid':M.curTenantID, 'seller_id':M.ciniki_marketplaces_main.seller.seller_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
@@ -542,7 +542,7 @@ function ciniki_marketplaces_main() {
                     }
                     M.ciniki_marketplaces_main.seller.close();
                 });
-        }
+        });
     }
     this.selleredit.addButton('save', 'Save', 'M.ciniki_marketplaces_main.selleredit.save();');
     this.selleredit.addClose('Cancel');
@@ -653,7 +653,7 @@ function ciniki_marketplaces_main() {
         }
     };
     this.itemedit.remove = function() {
-        if( confirm("Are you sure you want to remove this item?") ) {
+        M.confirm("Are you sure you want to remove this item?",null,function() {
             M.api.getJSONCb('ciniki.marketplaces.marketItemDelete', 
                 {'tnid':M.curTenantID, 'item_id':M.ciniki_marketplaces_main.itemedit.item_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
@@ -662,7 +662,7 @@ function ciniki_marketplaces_main() {
                     }
                     M.ciniki_marketplaces_main.itemedit.close();
                 });
-        }
+        });
     }
     this.itemedit.addButton('save', 'Save', 'M.ciniki_marketplaces_main.itemedit.save();');
     this.itemedit.addClose('Cancel');
@@ -763,7 +763,7 @@ function ciniki_marketplaces_main() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_marketplaces_main', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 
